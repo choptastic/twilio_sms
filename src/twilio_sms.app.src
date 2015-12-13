@@ -6,7 +6,9 @@
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+				  inets
                  ]},
-  {env, []}
+  {env, []},
+  {mod, {twilio_sms_app, []}}
  ]}.
