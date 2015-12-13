@@ -7,6 +7,7 @@
 
 %% API
 -export([start_link/0]).
+-export([send/2]).
 -export([send/3]).
 
 %% gen_server callbacks
@@ -24,10 +25,13 @@
 start_link() ->
         gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
+send(To, Text) ->
+	{Sid, Token, From} = get_credentials(),
+	queue(From, To, Text, Sid, Token).
+
 send(From, To, Text) ->
-	{Sid, Token} = get_credentials(),
-	Message = #message{from=From, to=To, text=Text, account_sid=Sid, auth_token=Token},
-	queue(Message).
+	{Sid, Token, _} = get_credentials(),
+	queue(From, To, Text, Sid, Token).
 
 init([]) ->
         {ok, #state{}, ?TIMEOUT}.
@@ -60,8 +64,12 @@ code_change(_OldVsn, State, _Extra) ->
 get_credentials() ->
 	{ok, Sid} = application:get_env(twilio_sms, account_sid),
 	{ok, Token} = application:get_env(twilio_sms, auth_token),
-	{Sid, Token}.
+	{ok, From} = application:get_env(twilio_sms, default_from),
+	{Sid, Token, From}.
 
+queue(From, To, Text, Sid, Token) ->
+	Message = #message{from=From, to=To, text=Text, account_sid=Sid, auth_token=Token},
+	queue(Message).
 
 queue(Message = #message{}) ->
 	gen_server:cast(?MODULE, {queue, Message}).
