@@ -1,13 +1,5 @@
-%%%-------------------------------------------------------------------
-%%% @author gumm
-%%% @copyright (C) 2015, gumm
-%%% @doc
-%%%
-%%% @end
-%%% Created : 2015-12-12 19:02:08.447908
-%%%-------------------------------------------------------------------
+%% vim: ts=4 sw=4 et
 -module(twilio_sms_sup).
-
 -behaviour(supervisor).
 
 %% API
@@ -17,57 +9,21 @@
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
-
-%%%===================================================================
-%%% API functions
-%%%===================================================================
-
-%%--------------------------------------------------------------------
-%% @doc
-%% Starts the supervisor
-%%
-%% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
-%% @end
-%%--------------------------------------------------------------------
 start_link() ->
-        supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+    supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-%%%===================================================================
-%%% Supervisor callbacks
-%%%===================================================================
-
-%%--------------------------------------------------------------------
-%% @private
-%% @doc
-%% Whenever a supervisor is started using supervisor:start_link/[2,3],
-%% this function is called by the new process to find out about
-%% restart strategy, maximum restart frequency and child
-%% specifications.
-%%
-%% @spec init(Args) -> {ok, {SupFlags, [ChildSpec]}} |
-%%                     ignore |
-%%                     {error, Reason}
-%% @end
-%%--------------------------------------------------------------------
 init([]) ->
-        RestartStrategy = one_for_one,
-        MaxRestarts = 1000,
-        MaxSecondsBetweenRestarts = 3600,
+    RestartStrategy = one_for_one,
+    MaxRestarts = 1000,
+    MaxSecondsBetweenRestarts = 3600,
 
-        SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
+    SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
 
-        Restart = permanent,
-        Shutdown = 2000,
-        Type = worker,
+    Restart = permanent,
+    Shutdown = 2000,
+    Type = worker,
 
-        AChild = {twilio_sms, {twilio_sms, start_link, []},
-                          Restart, Shutdown, Type, ['AModule']},
+    AChild = {twilio_sms, {twilio_sms, start_link, []},
+              Restart, Shutdown, Type, ['AModule']},
 
-        {ok, {SupFlags, [AChild]}}.
-
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================
-
-
-
+    {ok, {SupFlags, [AChild]}}.
