@@ -18,6 +18,7 @@
          terminate/2,
          code_change/3]).
 
+-compile(export_all).
 
 -record(message, {from, to, text, account_sid, auth_token}).
 -record(state, {queue=queue:new()}).
@@ -68,8 +69,30 @@ get_credentials() ->
 	{Sid, Token, From}.
 
 queue(From, To, Text, Sid, Token) ->
-	Message = #message{from=From, to=To, text=Text, account_sid=Sid, auth_token=Token},
-	queue(Message).
+	spawn(fun() ->
+		Parts = split_text(Text, 160),
+		lists:foreach(fun(Part) ->
+			Message = #message{from=From, to=To, text=Part, account_sid=Sid, auth_token=Token},
+			queue(Message),
+			timer:sleep(5000)
+		end, Parts)
+	end).
+
+split_text(Text, Chars) when length(Text) =< Chars ->
+	[Text];
+split_text(Text, Chars) when length(Text) =< Chars*9 ->
+	Parts = sigma:ceiling(length(Text) / (Chars - 6)),
+	split_text(Text, Chars, 1, Parts).
+
+split_text(Text, Chars, Part, Parts) when length(Text) < Chars-6 ->
+	[format_part(Text, Part, Parts)];
+split_text(Text, Chars, Part, Parts) ->
+	{This, Rest} = lists:split(Chars - 6, Text),
+	[format_part(This, Part, Parts) | split_text(Rest, Chars, Part+1, Parts)].
+
+format_part(Text, Part, Parts) ->
+	lists:flatten(io_lib:format("(~p/~p) ~s", [Part, Parts, Text])).
+	
 
 queue(Message = #message{}) ->
 	gen_server:cast(?MODULE, {queue, Message}).
@@ -88,7 +111,7 @@ real_send(#message{from=From, to=To, text=Text,
 
 	URL = "https://" ++ Sid ++ ":" ++ Token ++ "@api.twilio.com/2010-04-01/Accounts/" ++ Sid ++ "/Messages.json",
 	
-	Body = wf:to_list(wf:to_qs([{'From', From}, {'To', To}, {'Body', Text}])),
+	Body = wf:to_list(wf:to_qs([{'From', From}, {'To', To}, {'Body', wf:to_list(Text)}])),
 
 	Request = {
 		URL,
@@ -106,6 +129,9 @@ real_send(#message{from=From, to=To, text=Text,
 
 	case httpc:request(post, Request, HTTPOpts, Opts) of
 		{ok, {201, Result}} ->
-			{ok, Result}
+			{ok, Result};
+		{ok, {Code, ErrorJson}} ->
+			Proplist = wf:json_decode(ErrorJson),
+			error_logger:error_msg("There was an error sending message. HTTP Response Code: ~p~nError Response: ~p", [Code, Proplist])
 	end.
 
