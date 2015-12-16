@@ -8,6 +8,7 @@ In your .app file:
 
 ```erlang
 [{twilio_sms, [
+	{default_from, "5555555555"},
 	{account_sid, "ABCDF1234"},
 	{auth_token, "ABCDEF1235"}
 ]}].
@@ -23,10 +24,9 @@ application:start(twilio_sms).
 ## Send with it
 
 ```erlang
-From = "555555555",
 To = "6666666666",
 Message = "Hello from twilio_sms",
-twilio_sms:send(From, To, Message).
+twilio_sms:send(To, Message).
 ```
 
 ## Copyright
