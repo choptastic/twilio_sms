@@ -111,7 +111,7 @@ real_send(#message{from=From, to=To, text=Text,
 
 	URL = "https://" ++ Sid ++ ":" ++ Token ++ "@api.twilio.com/2010-04-01/Accounts/" ++ Sid ++ "/Messages.json",
 	
-	Body = wf:to_list(wf:to_qs([{'From', From}, {'To', To}, {'Body', wf:to_list(Text)}])),
+	Body = to_qs([{"From", From}, {"To", To}, {"Body", Text}]),
 
 	Request = {
 		URL,
@@ -131,7 +131,12 @@ real_send(#message{from=From, to=To, text=Text,
 		{ok, {201, Result}} ->
 			{ok, Result};
 		{ok, {Code, ErrorJson}} ->
-			Proplist = wf:json_decode(ErrorJson),
-			error_logger:error_msg("There was an error sending message. HTTP Response Code: ~p~nError Response: ~p", [Code, Proplist])
+			error_logger:error_msg("There was an error sending message. HTTP Response Code: ~p~nError Response: ~p", [Code, ErrorJson])
 	end.
 
+to_qs(List) ->
+	KVs = [escape_kv(KV) || KV <- List],
+	binary_to_list(iolist_to_binary(string:join(KVs, "&"))).
+
+escape_kv({Key, Val}) ->
+	[edoc_lib:escape_uri(Key), "=", edoc_lib:escape_uri(Val)].
