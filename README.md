@@ -14,7 +14,7 @@ In your .app file:
 ]}].
 ```
 
-## Start IT
+## Start it
 
 ```erlang
 application:start(inets). %% inets needs to be started first
