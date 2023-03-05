@@ -4,11 +4,8 @@
   {description, "A Minimal Erlang Twilio SMS Client - only sends"},
   {vsn, "0.1.0"},
   {registered, []},
-  {applications, [
-                  kernel,
-                  stdlib,
-                  inets
-                 ]},
+  {applications, [kernel, stdlib, inets]},
   {env, []},
+  {licenses, ["MIT"]},
   {mod, {twilio_sms_app, []}}
  ]}.
