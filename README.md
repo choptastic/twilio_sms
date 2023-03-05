@@ -2,9 +2,17 @@
 
 A hyper-minimal library for sending SMS messages
 
+## Add to rebar.config
+
+``
+{deps, [
+	...
+	twilio_sms
+]}.
+
 ## Configure it
 
-In your .app file:
+In your app.config file:
 
 ```erlang
 [{twilio_sms, [
@@ -17,8 +25,7 @@ In your .app file:
 ## Start it
 
 ```erlang
-application:start(inets). %% inets needs to be started first
-application:start(twilio_sms).
+application:ensure_all_started(twilio_sms).
 ```
 
 ## Send with it

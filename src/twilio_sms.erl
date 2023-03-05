@@ -100,8 +100,8 @@ spawn_send(Message) ->
     spawn(fun() ->
         try
             real_send(Message)
-        catch E:T ->
-            error_logger:error_msg("~p:~p~n~p~n", [E, T, erlang:get_stacktrace()])
+        catch E:T:S ->
+            error_logger:error_msg("~p:~p~n~p~n", [E, T, S])
         end
     end).
 
@@ -120,7 +120,8 @@ real_send(#message{from=From, to=To, text=Text,
     },
 
     HTTPOpts = [
-        {proxy_auth, {Sid, Token}}
+        {proxy_auth, {Sid, Token}},
+        {ssl, [{verify,verify_none}]}
     ],
     Opts = [
         {full_result, false}
