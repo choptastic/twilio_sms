@@ -90,7 +90,7 @@ split_text(Text, Chars, Part, Parts) ->
     [format_part(This, Part, Parts) | split_text(Rest, Chars, Part+1, Parts)].
 
 format_part(Text, Part, Parts) ->
-    lists:flatten(io_lib:format("(~p/~p) ~s", [Part, Parts, Text])).
+    lists:flatten(io_lib:format("(~p/~p) ~ts", [Part, Parts, Text])).
     
 
 queue(Message = #message{}) ->
