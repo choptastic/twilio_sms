@@ -4,11 +4,12 @@ A hyper-minimal library for sending SMS messages
 
 ## Add to rebar.config
 
-``
+```erlang
 {deps, [
 	...
 	twilio_sms
 ]}.
+```
 
 ## Configure it
 
