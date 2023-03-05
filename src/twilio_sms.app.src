@@ -1,7 +1,7 @@
 %% vim: ts=2 sw=2 et ft=erlang
 {application, twilio_sms,
  [
-  {description, "A minimal twilio SMS implementation in Erlang"},
+  {description, "A Minimal Erlang Twilio SMS Client - only sends"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications, [
