@@ -137,8 +137,10 @@ real_send(#message{from=From, to=To, text=Text,
     end.
 
 to_qs(List) ->
-    KVs = [escape_kv(KV) || KV <- List],
-    binary_to_list(iolist_to_binary(string:join(KVs, "&"))).
+
+    %KVs = [escape_kv(KV) || KV <- List],
+    Str = uri_string:compose_query(List),
+    binary_to_list(iolist_to_binary(Str)).
 
 escape_kv({Key, Val}) ->
     [edoc_lib:escape_uri(Key), "=", edoc_lib:escape_uri(Val)].
